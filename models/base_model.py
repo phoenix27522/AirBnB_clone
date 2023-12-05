@@ -5,6 +5,7 @@ Contains the Base class for the AirBnB clone console.
 
 from datetime import datetime
 import uuid
+import models
 
 
 class BaseModel:
@@ -37,9 +38,7 @@ class BaseModel:
                 else:
                     setattr(self, key, value)
         else:
-            self.id = id or str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
+            models.storage.new(self)
 
     def __str__(self):
         """string representation of the calss"""
@@ -50,6 +49,7 @@ class BaseModel:
         """Updates the 'updated_at' attribute with the current datetime."""
 
         self.updated_at = datetime.now()
+        models.storage.save()
 
     def to_dict(self):
         """Return a dictionary representation of the instance."""
