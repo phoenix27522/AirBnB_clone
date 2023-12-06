@@ -6,44 +6,41 @@ from models.base_model import BaseModel
 import models
 
 class FileStorage:
-    """class that stores info and helps to serialize and deserialize.
+    """class that stores info and help to serialize and desrialize.
 
     Attributes:
-        _file_path(str): the name of the file to store the objects.
-        _objects(dict): A dictionary of instantiated objects.
+        __file_path(str): the name of the file to the objects to.
+        __objects(dict): A dictionary of instantiated objects.
     """
 
-    _file_path = "airbnb.json"
-    _objects = {}
+    __file_path = "airbnb.json"
+    __objects = {}
 
     def all(self):
-        """Returns the dictionary of _objects."""
-        return self._objects
+        """Returns the dictionary of __objects."""
+        return FileStorage.__objects
 
     def new(self, obj):
-        """Sets a unique identifier "id"."""
-        key = f"{obj.__class__.__name__}.{obj.id}"
-        self._objects[key] = obj
+        """sets a unique identifier "id" """
+        key = "{}.{}".format(obj.__class__.__name__, obj.id)
+        FileStorage.__objects[key] = obj
 
     def save(self):
-        """Serializes the _objects to a JSON file."""
-        new_dict = {key: obj.to_dict() for key, obj in self._objects.items()}
-        with open(self._file_path, "w") as file:
+        """serialize the __object to json file. """
+        ob_dict = FileStorage.__objects
+        new_dict = {key: obj.to_dict() for key,
+                    obj in FileStorage.__objects.items()}
+        with open(FileStorage.__file_path, "w") as file:
             json.dump(new_dict, file)
 
     def reload(self):
-        """Deserializes the JSON file."""
+        """Deserialize the json file """
         try:
-            with open(self._file_path) as file:
+            with open(FileStorage.__file_path) as file:
                 new_dict = json.load(file)
                 for i in new_dict.values():
-                    name_cls = i.pop("__class__", None)
-                    if name_cls:
-                        cls = getattr(models, name_cls, None)
-                        if cls:
-                            self.new(cls(**i))
-                    else:
-                        raise ValueError("Missing '__class__' key in JSON")
+                    name_cls = i["__class__"]
+                    del i["__class__"]
+                    self.new(eval(name_cls)(**i))
         except FileNotFoundError:
-            # Handle the case where the file is not found
             pass
