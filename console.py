@@ -1,13 +1,15 @@
 #!/usr/bin/python3
 """Defines the HBnB console."""
 import cmd
-import json
-from models.base_model import BaseModel
 import re
 from models import storage
 from shlex import split
-from models import storage
-
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 
 def parse(args):
     curley_brace = re.search(r"\{(.*?)\}", args)
@@ -34,6 +36,12 @@ class HBNBCommand(cmd.Cmd):
     prompt = "(hbnb)"
     __commands = {
         "BaseModel",
+        "User",
+        "State",
+        "City",
+        "Amenity",
+        "Place",
+        "Review"
     }
 
     def emptyline(self):
