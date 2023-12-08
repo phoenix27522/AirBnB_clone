@@ -3,6 +3,7 @@
 
 import cmd
 import re
+from models.base_model import BaseModel
 from models import storage
 from shlex import split
 from models.user import User
@@ -46,7 +47,7 @@ def parse(args):
 class HBNBCommand(cmd.Cmd):
     """Defines the HolbertonBnB command interpreter."""
 
-    prompt = "(hbnb)"
+    prompt = "(hbnb) "
     __commands = {
         "BaseModel",
         "User",
@@ -154,19 +155,43 @@ class HBNBCommand(cmd.Cmd):
             instance.save()
             storage.save()
 
-    def default(self, args):
+    def default(self, arg):
+        """Default behavior for cmd module when input is invalid"""
         replace = {
             "all": self.do_all,
+            "show": self.do_show,
+            "destroy": self.do_destroy,
+            "count": self.do_count,
+            "update": self.do_update
         }
-        match = re.search(r"\.(\w+)\((.*?)\)", args)
-        if match:
-            method = match.group(1)
-            params = match.group(2)
-            if method in replace:
-                # Call the respective method with parameters
-                return replace[method](params)
-        print("*** Unknown syntax: {}".format(args))
+        match_dot = re.search(r"\.", arg)
+        if match_dot:
+            command, args = arg.split(".", 1)
+            match_bracket = re.search(r"\((.*?)\)", args)
+            if match_bracket:
+                command_name = args[:match_bracket.start()].strip()
+                command_args = args[
+                    match_bracket.start() + 1:match_bracket.end() - 1]
+                if command_name in replace:
+                    return replace[command_name](f"{command} {command_args}")
+        print("*** Unknown syntax: {}".format(arg))
         return False
+
+    def do_count(self, args):
+        """Counts the number of instances of a specified class.
+
+        Args:
+            args (str): The class name for which the instances are counted.
+
+        Prints the count of instances of the specified class.
+        """
+        class_name = args.strip()
+        count = 0
+        all_objects = storage.all().values()
+        for obj in all_objects:
+            if type(obj).__name__ == class_name:
+                count += 1
+        print(count)
 
 
 if __name__ == "__main__":
