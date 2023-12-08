@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """Defines the HBnB console."""
+
 import cmd
 import re
 from models import storage
@@ -11,7 +12,19 @@ from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
 
+
 def parse(args):
+    """Parses the provided string argument into a list
+       based on enclosed curly braces or square brackets.
+
+    Args:
+    - args (str): A string containing arguments possibly
+                  enclosed in curly braces '{}' or square brackets '[]'.
+
+    Returns:
+    - list: A list of parsed arguments stripped
+            of commas and enclosing brackets.
+    """
     curley_brace = re.search(r"\{(.*?)\}", args)
     bracket = re.search(r"\[(.*?)\]", args)
 
@@ -111,7 +124,11 @@ class HBNBCommand(cmd.Cmd):
         elif arg[0] not in HBNBCommand.__commands:
             print("** class doesn't exist **")
         else:
-            print([str(val) for key, val in sto_file.items() if key.startswith(arg[0])])
+            print([
+                str(val)
+                for key, val in sto_file.items()
+                if key.startswith(arg[0])
+                ])
 
     def do_update(self, args):
         """Updates an instance based on the class name and id"""
@@ -137,6 +154,19 @@ class HBNBCommand(cmd.Cmd):
             instance.save()
             storage.save()
 
+    def default(self, args):
+        replace = {
+            "all": self.do_all,
+        }
+        match = re.search(r"\.(\w+)\((.*?)\)", args)
+        if match:
+            method = match.group(1)
+            params = match.group(2)
+            if method in replace:
+                # Call the respective method with parameters
+                return replace[method](params)
+        print("*** Unknown syntax: {}".format(args))
+        return False
 
 
 if __name__ == "__main__":

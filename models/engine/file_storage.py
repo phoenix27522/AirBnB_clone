@@ -11,7 +11,6 @@ from models.place import Place
 from models.review import Review
 
 
-
 class FileStorage:
     """class that stores info and help to serialize and desrialize.
 
