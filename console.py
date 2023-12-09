@@ -75,7 +75,7 @@ class HBNBCommand(cmd.Cmd):
         """Creats a new instance of the BaseModel"""
         arg = parse(args)
         if len(arg) == 0:
-            print("** class doesn't exist **")
+            print("** class name missing **")
         elif arg[0] not in HBNBCommand.__commands:
             print("** class doesn't exist **")
         else:
@@ -94,7 +94,7 @@ class HBNBCommand(cmd.Cmd):
         elif arg[0] not in HBNBCommand.__commands:
             print("** class doesn't exist **")
         elif "{}.{}".format(arg[0], arg[1]) not in sto_file:
-            print("** no insatnce found **")
+            print("** no instance found **")
         else:
             print(sto_file["{}.{}".format(arg[0], arg[1])])
 
@@ -106,7 +106,7 @@ class HBNBCommand(cmd.Cmd):
         if len(arg) == 0:
             print("** class name missing")
         elif len(arg) == 1:
-            print("** instance id is missing **")
+            print("** instance id missing **")
         elif arg[0] not in HBNBCommand.__commands:
             print("** class doesn't exist **")
         elif "{}.{}".format(arg[0], arg[1]) not in sto_file:
