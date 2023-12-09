@@ -3,7 +3,7 @@
 from models.base_model import BaseModel
 
 
-class Place:
+class Place(BaseModel):
     """Represent place in the system
 
     Attributes:
