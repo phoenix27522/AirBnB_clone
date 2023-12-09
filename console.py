@@ -104,7 +104,7 @@ class HBNBCommand(cmd.Cmd):
         sto_file = storage.all()
 
         if len(arg) == 0:
-            print("** class name missing")
+            print("** class name missing **")
         elif len(arg) == 1:
             print("** instance id missing **")
         elif arg[0] not in HBNBCommand.__commands:
