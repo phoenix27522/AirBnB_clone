@@ -115,21 +115,21 @@ class HBNBCommand(cmd.Cmd):
             del sto_file["{}.{}".format(arg[0], arg[1])]
             storage.save()
 
-    def do_all(self, args):
-        """Prints all instances based or not on the class name"""
-        arg = parse(args)
-        sto_file = storage.all()
-
-        if len(arg) == 0:
-            print([str(val) for val in sto_file.values()])
-        elif arg[0] not in HBNBCommand.__commands:
+    def do_all(self, arg):
+        """Usage: all or all <class> or <class>.all()
+        Display string representations of all instances of a given class.
+        If no class is specified, displays all instantiated objects."""
+        argl = parse(arg)
+        if len(argl) > 0 and argl[0] not in HBNBCommand.__classes:
             print("** class doesn't exist **")
         else:
-            print([
-                str(val)
-                for key, val in sto_file.items()
-                if key.startswith(arg[0])
-                ])
+            objl = []
+            for obj in storage.all().values():
+                if len(argl) > 0 and argl[0] == obj.__class__.__name__:
+                    objl.append(obj.__str__())
+                elif len(argl) == 0:
+                    objl.append(obj.__str__())
+            print(objl)
 
     def do_update(self, args):
         """Updates an instance based on the class name and id"""
