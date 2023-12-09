@@ -27,9 +27,9 @@ class FileStorage:
         return FileStorage.__objects
 
     def new(self, obj):
-        """Set in __objects obj with key <obj_class_name>.id"""
-        ocname = obj.__class__.__name__
-        FileStorage.__objects["{}.{}".format(ocname, obj.id)] = obj
+        """sets a unique identifier "id" """
+        key = "{}.{}".format(obj.__class__.__name__, obj.id)
+        FileStorage.__objects[key] = obj
 
     def save(self):
         """serialize the __object to json file. """
@@ -39,13 +39,13 @@ class FileStorage:
             json.dump(new_dict, file)
 
     def reload(self):
-        """Deserialize the json file """
+        """Deserialize the JSON file __file_path to __objects, if it exists."""
         try:
-            with open(FileStorage.__file_path) as file:
-                new_dict = json.load(file)
-                for i in new_dict.values():
-                    name_cls = i["__class__"]
-                    del i["__class__"]
-                    self.new(eval(name_cls)(**i))
+            with open(FileStorage.__file_path) as f:
+                objdict = json.load(f)
+                for o in objdict.values():
+                    cls_name = o["__class__"]
+                    del o["__class__"]
+                    self.new(eval(cls_name)(**o))
         except FileNotFoundError:
             return
