@@ -19,7 +19,7 @@ class FileStorage:
         __objects(dict): A dictionary of instantiated objects.
     """
 
-    __file_path = "airbnb.json"
+    __file_path = "file.json"
     __objects = {}
 
     def all(self):
@@ -39,13 +39,13 @@ class FileStorage:
             json.dump(new_dict, file)
 
     def reload(self):
-        """Deserialize the JSON file __file_path to __objects, if it exists."""
+        """Deserialize the json file """
         try:
-            with open(FileStorage.__file_path) as f:
-                objdict = json.load(f)
-                for o in objdict.values():
-                    cls_name = o["__class__"]
-                    del o["__class__"]
-                    self.new(eval(cls_name)(**o))
+            with open(FileStorage.__file_path) as file:
+                new_dict = json.load(file)
+                for i in new_dict.values():
+                    name_cls = i["__class__"]
+                    del i["__class__"]
+                    self.new(eval(name_cls)(**i))
         except FileNotFoundError:
             return
