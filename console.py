@@ -33,12 +33,12 @@ def parse(args):
         if bracket is None:
             return [i.strip(",") for i in split(args)]
         else:
-            sp_brac = args[:bracket.span()[0]].split(',')
+            sp_brac = split(args[:bracket.span()[0]])
             list_t = [i.strip(",") for i in sp_brac]
             list_t.append(curley_brace.group())
             return list_t
     else:
-        sp_curly = args[:curley_brace.span()[0]].split(',')
+        sp_curly = split(args[:curley_brace.span()[0]])
         list_t = [i.strip(",") for i in sp_curly]
         list_t.append(curley_brace.group())
         return list_t
@@ -138,22 +138,34 @@ class HBNBCommand(cmd.Cmd):
 
         if len(arg) == 0:
             print("** class name missing **")
-        elif len(arg) == 1:
-            print("** instance id missing **")
-        elif arg[0] not in HBNBCommand.__commands:
+            return False
+        if arg[0] not in HBNBCommand.__commands:
             print("** class doesn't exist **")
-        elif "{}.{}".format(arg[0], arg[1]) not in sto_file:
+            return False
+        if len(arg) == 1:
+            print("** instance id missing **")
+            return False
+        instance_key = "{}.{}".format(arg[0], arg[1])
+        if instance_key not in sto_file.keys():
             print("** no instance found **")
-        elif len(arg) == 2:
+            return False
+        if len(arg) == 2:
             print("** attribute name missing **")
-        elif len(arg) == 3:
+            return False
+        if len(arg) == 3 and not isinstance(eval(arg[2]), dict):
             print("** value missing **")
-        else:
-            instance_key = "{}.{}".format(arg[0], arg[1])
-            instance = sto_file[instance_key]
-            setattr(instance, arg[2], arg[3])
-            instance.save()
-            storage.save()
+            return False
+
+        obj = sto_file[instance_key]
+        if len(arg) == 4:
+            setattr(obj, arg[2], arg[3])
+        elif isinstance(eval(arg[2]), dict):
+            for key, value in eval(arg[2]).items():
+                if hasattr(obj, key):
+                    setattr(obj, key, value)
+                else:
+                    obj.__dict__[key] = value
+        storage.save()
 
     def default(self, arg):
         """Default behavior for cmd module when input is invalid"""
