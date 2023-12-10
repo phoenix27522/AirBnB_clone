@@ -35,12 +35,12 @@ def parse(args):
         else:
             sp_brac = args[:bracket.span()[0]].split(',')
             list_t = [i.strip(",") for i in sp_brac]
-            list_t.append[bracket.group()]
+            list_t.append(curley_brace.group())
             return list_t
     else:
         sp_curly = args[:curley_brace.span()[0]].split(',')
         list_t = [i.strip(",") for i in sp_curly]
-        list_t.append[curley_brace.group()]
+        list_t.append(curley_brace.group())
         return list_t
 
 
