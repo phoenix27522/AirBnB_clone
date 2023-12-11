@@ -1,58 +1,59 @@
-#!/usr/bin/python3
-"""This script contains the base model"""
+#!/usr/bim/python3
+"""Module for Base class
+Contains the Base class for the AirBnB clone console.
+"""
 
-import uuid
 from datetime import datetime
+import uuid
+import models
 
 
 class BaseModel:
+    """Base class for all models in the application.
 
-    """the class from which all  classes will inherit"""
+    Attributes:
+        id (str): Identifier for the model instance.
+        created_at (datetime): Timestamp indicating when
+                               the model instance was created.
+        updated_at (datetime): Timestamp indicating when
+                               the model instance was last updated.
+    """
 
     def __init__(self, *args, **kwargs):
-        from models import storage
-        """construct for BaseModel
+        """Initialization of a Base instance.
 
         Args:
-            - *args: variable list of arguments
-            - **kwargs: artibutrary keyword arguments
-            - dict of key-values arguments
+            - *args: list of arguments
+            - **kwargs: dict of key-value arguments
         """
-        if kwargs is not None and kwargs != {}:
-            for key in kwargs:
-                if key == "created_at":
-                    self.__dict__["created_at"] = datetime.strptime(
-                        kwargs["created_at"], "%Y-%m-%dT%H:%M:%S.%f")
-                elif key == "updated_at":
-                    self.__dict__["updated_at"] = datetime.strptime(
-                        kwargs["updated_at"], "%Y-%m-%dT%H:%M:%S.%f")
-                else:
-                    self.__dict__[key] = kwargs[key]
-        else:
-            self.my_number = None  # Add missing attribute
-            self.name = None  # Add missing attribute
-            self.updated_at = datetime.now()
+        if not kwargs or ('id' not in kwargs or 'created_at'
+                          not in kwargs or 'updated_at' not in kwargs):
             self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            storage.new(self)
+            self.created_at = datetime.today()
+            self.updated_at = datetime.today()
+            models.storage.new(self)
+        else:
+            kwargs.pop('__class__', None)
+            for key, value in kwargs.items():
+                if key == "created_at" or key == "updated_at":
+                    setattr(self, key, datetime.strptime(
+                        value, "%Y-%m-%dT%H:%M:%S.%f"))
+                else:
+                    setattr(self, key, value)
 
     def __str__(self):
-        """Returns official string representation"""
-
-        return "[{}] ({}) {}".\
-            format(type(self).__name__, self.id, self.__dict__)
+        """String representation of the class."""
+        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
 
     def save(self):
-        """updates the public instance attribute updated_at"""
-        from models import storage
+        """Updates the 'updated_at' attribute with the current datetime."""
         self.updated_at = datetime.now()
-        storage.save()
+        models.storage.save()
 
     def to_dict(self):
-        """returns a dictionary containing all keys/values of __dict__"""
-
-        instance_dict = self.__dict__.copy()
-        instance_dict["updated_at"] = instance_dict["updated_at"].isoformat()
-        instance_dict["created_at"] = instance_dict["created_at"].isoformat()
-        instance_dict["__class__"] = type(self).__name__
-        return instance_dict
+        """Return a dictionary representation of the instance."""
+        base_dict = self.__dict__.copy()
+        base_dict['__class__'] = self.__class__.__name__
+        base_dict['created_at'] = base_dict['created_at'].isoformat()
+        base_dict['updated_at'] = base_dict['updated_at'].isoformat()
+        return base_dict
