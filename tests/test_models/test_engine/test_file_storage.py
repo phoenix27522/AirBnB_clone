@@ -68,5 +68,6 @@ class TestFileStorage(unittest.TestCase):
         expected_content = {f"BaseModel.{obj.id}": obj.to_dict()}
         self.assertEqual(file_content, expected_content)
 
+
 if __name__ == '__main__':
     unittest.main()
