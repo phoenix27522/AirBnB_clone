@@ -131,51 +131,41 @@ class HBNBCommand(cmd.Cmd):
                 if key.startswith(arg[0])
                 ])
 
-    def do_update(self, arg):
-        """Updates an instance by adding or updating attribute."""
-        if arg == "" or arg is None:
-            print("** class name missing **")
-            return
+    def do_update(self, args):
+        """Updates an instance based on the class name and id"""
+        arg = parse(args)
+        sto_file = storage.all()
 
-        rex = r'^(\S+)(?:\s(\S+)(?:\s(\S+)(?:\s((?:"[^"]*")|(?:(\S)+)))?)?)?'
-        match = re.search(rex, arg)
-        className = match.group(1)
-        uid = match.group(2)
-        attr = match.group(3)
-        value = match.group(4)
-        if not match:
+        if len(arg) == 0:
             print("** class name missing **")
-        elif className not in storage.classes():
+            return False
+        if arg[0] not in HBNBCommand.__commands:
             print("** class doesn't exist **")
-        elif uid is None:
+            return False
+        if len(arg) == 1:
             print("** instance id missing **")
-        else:
-            key = "{}.{}".format(className, uid)
-            if key not in storage.all():
-                print("** no instance found **")
-            elif not attr:
-                print("** attribute name missing **")
-            elif not value:
-                print("** value missing **")
-            else:
-                patch = None
-                if not re.search('^".*"$', value):
-                    if '.' in value:
-                        patch = float
-                    else:
-                        patch = int
+            return False
+        instance_key = "{}.{}".format(arg[0], arg[1])
+        if instance_key not in sto_file.keys():
+            print("** no instance found **")
+            return False
+        if len(arg) == 2:
+            print("** attribute name missing **")
+            return False
+        if len(arg) == 3 and not isinstance(eval(arg[2]), dict):
+            print("** value missing **")
+            return False
+
+        obj = sto_file[instance_key]
+        if len(arg) == 4:
+            setattr(obj, arg[2], arg[3])
+        elif isinstance(eval(arg[2]), dict):
+            for key, value in eval(arg[2]).items():
+                if hasattr(obj, key):
+                    setattr(obj, key, value)
                 else:
-                    value = value.replace('"', '')
-                attribute = storage.attributes()[className]
-                if attr in attribute:
-                    value = attribute[attr](value)
-                elif patch:
-                    try:
-                        value = patch(value)
-                    except ValueError:
-                        pass
-                setattr(storage.all()[key], attr, value)
-                storage.all()[key].save()
+                    obj.__dict__[key] = value
+        storage.save()
 
     def default(self, arg):
         """Default behavior for cmd module when input is invalid"""
